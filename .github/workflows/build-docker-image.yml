@@ -1,39 +1,74 @@
-name: Build Docker images
+name: Publish Docker image
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types: [published]
 
 jobs:
-  build-and-push:
+  push_to_registry:
+    name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      # # Build and push Python service Docker image
-      # - name: Build Python service Docker image
-      #   uses: docker/build-push-action@v2
-      #   with:
-      #     context: ./python-service
-      #     push: true
-      #     tags: my-registry/python-service:${{ github.sha }}
-
-      # Build and push React app Docker image
-      - name: Build React app Docker image
-        uses: docker/build-push-action@v2
+      - name: Check out the repo
+        uses: actions/checkout@v3
+      
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
         with:
-          context: ./frontend
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: bravor/frontend-music-app
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: .
           push: true
-          tags: bravor/frontend-music-app:${{ github.sha }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
-      # # Build and push MongoDB Docker image
-      # - name: Build MongoDB Docker image
-      #   uses: docker/build-push-action@v2
-      #   with:
-      #     context: ./mongo-db
-      #     push: true
-      #     tags: my-registry/mongo-db:${{ github.sha }}.
+
+# name: Build Docker images
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   build-and-push:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v2
+
+#       # # Build and push Python service Docker image
+#       # - name: Build Python service Docker image
+#       #   uses: docker/build-push-action@v2
+#       #   with:
+#       #     context: ./python-service
+#       #     push: true
+#       #     tags: my-registry/python-service:${{ github.sha }}
+
+#       # Build and push React app Docker image
+#       - name: Build React app Docker image
+#         uses: docker/build-push-action@v2
+#         with:
+#           context: ./frontend
+#           push: true
+#           tags: bravor/frontend-music-app:${{ github.sha }}
+
+#       # # Build and push MongoDB Docker image
+#       # - name: Build MongoDB Docker image
+#       #   uses: docker/build-push-action@v2
+#       #   with:
+#       #     context: ./mongo-db
+#       #     push: true
+#       #     tags: my-registry/mongo-db:${{ github.sha }}.
 
 
