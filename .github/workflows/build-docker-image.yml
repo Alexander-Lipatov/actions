@@ -34,4 +34,6 @@ jobs:
       #   with:
       #     context: ./mongo-db
       #     push: true
-      #     tags: my-registry/mongo-db:${{ github.sha }}
+      #     tags: my-registry/mongo-db:${{ github.sha }}.
+
+
